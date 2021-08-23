@@ -1,0 +1,18 @@
+Package: SapCal
+Title: Calculation of sap flow using HFD and LHB methods
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Junbin",
+           family = "Zhao",
+           role = c("aut", "cre"),
+           email = "junbinzhao1985@gmail.com",
+           comment = c(ORCID = "ID0000-0001-5142-4901"))
+Description: This package is created associated with the study "Inconsistent results
+of sap flow calculations from Heat Field Deformation (HFD) and Linear Heat Balance 
+(LHB) methods" (Zhao et al., to be published). The package includes functions to 
+calculate sap flow density using the HFD and LHB approaches. 
+License: `use_mit_license()`
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1

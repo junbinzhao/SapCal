@@ -2,19 +2,70 @@
 % Please edit documentation in R/Calculation_LHB.R
 \name{Cal_LHB}
 \alias{Cal_LHB}
-\title{Title}
+\title{Calculate sap flow density using the LHB approach}
 \usage{
-Cal_LHB(file, k = 2)
+Cal_LHB(
+  data,
+  T_up = NULL,
+  T_low = NULL,
+  T_side = NULL,
+  K,
+  ratio = 2,
+  Heat,
+  Zax = 1.5,
+  Ztg = 0.5
+)
 }
 \arguments{
-\item{No}{}
+\item{data}{a data frame that includes the measured sap flow data}
+
+\item{T_up}{a string indicates the column name for the temperature measured by the upper sensor}
+
+\item{T_low}{a string indicates the column name for the temperature measured by the lower sensor}
+
+\item{T_side}{a string indicates the column name for the temperature measured by the side sensor}
+
+\item{K}{a numeric value (constant K) or a string that indicates the column name (dynamic K).
+K value indicates the dTasym value when zero sap flow occurs, see Nadezhdina et al. 2012}
+
+\item{ratio}{a numeric value; the ratio between the thermal conductivities of wood in the axial
+and tangential directions; default: 2 (Trcala and Cermak 2016)}
+
+\item{Heat}{a numeric value; the heating power used for the probe (W m-1)}
+
+\item{Zax}{a numeric value; axial distance of the sensors, cm. Default: 1.5}
+
+\item{Ztg}{a numeric value; tangential distance of the sensors, cm. Default: 0.5}
 }
 \value{
-
+a data frame with an additional column of the calculated sap flow density
+(SFD_lhb, g cm-2 h-1).
 }
 \description{
-Title
+A function to calculate sap flow density using the LHB approach. The temperatures
+that are directly measured by sensors (upper, lower and side) must be provided.
 }
 \examples{
+# load example data
+df <- read.csv(file = system.file("extdata", "Soil_resp_example.csv", package = "FluxGapsR"),
+header=T)
 
+# convert the data into long format
+df <- df \%>\%
+  pivot_longer(cols = Temp1U:Temp8S,
+               names_to = c(".value","Position"),
+               names_sep = c(5)) \%>\%
+  pivot_longer(cols = starts_with(c("K","Temp")),
+               names_to = c(".value","Depth"),
+               names_sep = -1) \%>\%
+  pivot_wider(names_from = Position,
+              values_from = Temp)
+
+# calculate sap flow density using dynamic K values that are provided as a variable
+df_lhb1 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K="K",Heat=2.6)
+head(df_lhb1$SFD_lhb)
+
+# calculate sap flow density using constant K value
+df_lhb2 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K=.6,Heat=2.6)
+head(df_lhb2$SFD_lhb)
 }

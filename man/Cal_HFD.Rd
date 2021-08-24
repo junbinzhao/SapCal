@@ -32,18 +32,17 @@ the dTasym value when zero sap flow occurs, see Nadezhdina et al. 2012}
 
 \item{Dst}{a numeric value; wood thermal diffusivity, cm2 s-1; default: 0.0025}
 
-\item{Zax}{a numeric value; axial distance of the sensors, cm}
+\item{Zax}{a numeric value; axial distance of the sensors, cm. Default: 1.5}
 
-\item{Ztg}{a numeric value; tangential distance of the sensors, cm}
+\item{Ztg}{a numeric value; tangential distance of the sensors, cm. Default: 0.5}
 }
 \value{
 a data frame with an additional column of the calculated sap flow density
 (SFD_hfd, g cm-2 h-1).
 }
 \description{
-A function to calculate sap flow density using the HFD approach. Either the temperatures
-that are directly measured by sensors (upper, lower and side) or temperature differences between the
-sensors (dTsym and dTasym) must be provided.
+A function to calculate sap flow density using the HFD approach. The temperatures
+that are directly measured by sensors (upper, lower and side) must be provided.
 }
 \examples{
 # load example data

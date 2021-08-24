@@ -1,26 +1,52 @@
-#' Title
+#' Calculate sap flow density using the LHB approach
+#' @description A function to calculate sap flow density using the LHB approach (Trcala and Cermak 2016).
+#' The temperatures that are directly measured by sensors (upper, lower and side) must be provided.
 #'
-#' @param data
-#' @param T_up
-#' @param T_low
-#' @param T_side
-#' @param dt0
-#' @param k
-#' @param Heat
-#' @param Zax
-#' @param Ztg
+#' @param data a data frame that includes the measured sap flow data
+#' @param T_up a string indicates the column name for the temperature measured by the upper sensor
+#' @param T_low a string indicates the column name for the temperature measured by the lower sensor
+#' @param T_side a string indicates the column name for the temperature measured by the side sensor
+#' @param Heat a numeric value; the heating power used for the probe (W m-1)
+#' @param Zax a numeric value; axial distance of the sensors, cm. Default: 1.5
+#' @param Ztg a numeric value; tangential distance of the sensors, cm. Default: 0.5
+#' @param K a numeric value (constant K) or a string that indicates the column name (dynamic K).
+#' K value indicates the dTasym value when zero sap flow occurs, see Nadezhdina et al. 2012
+#' @param ratio a numeric value; the ratio between the thermal conductivities of wood in the axial
+#' and tangential directions; default: 2 (Trcala and Cermak 2016)
 #'
-#' @return
+#' @return a data frame with an additional column of the calculated sap flow density
+#' (SFD_lhb, g cm-2 h-1).
 #'
 #' @examples
+#' # load example data
+#' df <- read.csv(file = system.file("extdata", "Soil_resp_example.csv", package = "FluxGapsR"),
+#' header=T)
 #'
+#' # convert the data into long format
+#' df <- df %>%
+#'   pivot_longer(cols = Temp1U:Temp8S,
+#'                names_to = c(".value","Position"),
+#'                names_sep = c(5)) %>%
+#'   pivot_longer(cols = starts_with(c("K","Temp")),
+#'                names_to = c(".value","Depth"),
+#'                names_sep = -1) %>%
+#'   pivot_wider(names_from = Position,
+#'               values_from = Temp)
+#'
+#' # calculate sap flow density using dynamic K values that are provided as a variable
+#' df_lhb1 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K="K",Heat=2.6)
+#' head(df_lhb1$SFD_lhb)
+#'
+#' # calculate sap flow density using constant K value
+#' df_lhb2 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K=.6,Heat=2.6)
+#' head(df_lhb2$SFD_lhb)
 #' @export
 Cal_LHB <- function(data,
-                    T_up=NULL,
-                    T_low=NULL,
-                    T_side=NULL,
-                    dt0, # oC; -K in HFD
-                    k=2, # ratio between Lam_T and Lam_L
+                    T_up,
+                    T_low,
+                    T_side,
+                    K, # oC; K in HFD
+                    ratio=2, # ratio between Lam_T and Lam_L
                     Heat, # W m-1
                     Zax = 1.5, # axial distance, cm
                     Ztg = 0.5 # tangential distance, cm
@@ -30,10 +56,11 @@ Cal_LHB <- function(data,
   dx <- Ztg*0.01 # m
   dy <- Zax*0.01 # m
   H <- Heat # W m-1
+  k <- ratio
   SFD_lhb <- vector(length = nrow(data)) # create a vector for calculated flux
   for (i in 1:nrow(data)) {
     # variable from data
-    dT0 <- ifelse(is.numeric(dt0),dt0,-data[i,dt0]) # oC; K in HFD
+    dT0 <- ifelse(is.numeric(K),-K,-data[i,K]) # oC; K in HFD
     T_u <- data[i,T_up] # oC; upper sensor temperature
     T_s <- data[i,T_side] # oC; side sensor temperature
     T_l <- data[i,T_low] # oC; lower sensor temperature

@@ -1,7 +1,6 @@
 #' Calculate sap flow density using the HFD approach
-#' @description A function to calculate sap flow density using the HFD approach. Either the temperatures
-#' that are directly measured by sensors (upper, lower and side) or temperature differences between the
-#' sensors (dTsym and dTasym) must be provided.
+#' @description A function to calculate sap flow density using the HFD approach (Nadezhdina et al. 2012).
+#' The temperatures that are directly measured by sensors (upper, lower and side) must be provided.
 #'
 #' @param L a numeric value; sapwood depth, cm
 #' @param Dst a numeric value; wood thermal diffusivity, cm2 s-1; default: 0.0025
@@ -11,8 +10,8 @@
 #' @param T_side column name for the temperature measured by the side sensor
 #' @param K a numeric value (constant K) or a column name (dynamic K). K value indicates
 #' the dTasym value when zero sap flow occurs, see Nadezhdina et al. 2012
-#' @param Zax a numeric value; axial distance of the sensors, cm
-#' @param Ztg a numeric value; tangential distance of the sensors, cm
+#' @param Zax a numeric value; axial distance of the sensors, cm. Default: 1.5
+#' @param Ztg a numeric value; tangential distance of the sensors, cm. Default: 0.5
 #'
 #' @return a data frame with an additional column of the calculated sap flow density
 #' (SFD_hfd, g cm-2 h-1).
@@ -44,9 +43,9 @@
 #'
 #' @export
 Cal_HFD <- function(data,
-                    T_up=NULL,
-                    T_low=NULL,
-                    T_side=NULL,
+                    T_up,
+                    T_low,
+                    T_side,
                     K,
                     L, # sapwood depth, cm
                     Dst = 0.0025, # thermal diffusivity, cm2 s-1

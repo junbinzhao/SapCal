@@ -24,14 +24,30 @@
 #' header=T)
 #'
 #' # convert the data into long format
+#' df <- df %>%
+#'   pivot_longer(cols = Temp1U:Temp8S,
+#'                names_to = c(".value","Position"),
+#'                names_sep = c(5)) %>%
+#'   pivot_longer(cols = starts_with(c("K","Temp")),
+#'                names_to = c(".value","Depth"),
+#'                names_sep = -1) %>%
+#'   pivot_wider(names_from = Position,
+#'               values_from = Temp)
+#'
+#' # calculate sap flow density using dynamic K values that are provided as a variable
+#' df_hfd1 <- Cal_HFD(df,T_up = U,T_low = L,T_side = S,K=K,L=7.5)
+#' head(df_hfd1$SFD_hfd)
+#'
+#' # calculate sap flow density using constant K value
+#' df <- df %>% select(-K)
+#' df_hfd2 <- Cal_HFD(df,T_up = U,T_low = L,T_side = S,K=.6,L=7.5)
+#' head(df_hfd2$SFD_hfd)
 #'
 #' @export
 Cal_HFD <- function(data,
                     T_up=NULL,
                     T_low=NULL,
                     T_side=NULL,
-                    Sym=NULL,
-                    Asym=NULL,
                     K,
                     L, # sapwood depth, cm
                     Dst = 0.0025, # thermal diffusivity, cm2 s-1
@@ -39,15 +55,13 @@ Cal_HFD <- function(data,
                     Ztg = 0.5 # tangential distance, cm
 ) {
   # if no temperature or difference info is provided
-  if (is.null(T_up) & is.null(Sym)) {
-    stop("Either temperature or temperature difference columns need to be assigned!")
-  }
+  # if (is.null(T_up)) {
+  #   stop("Temperature columns need to be assigned!")
+  # }
 
   # check whether K is a number or a column
-  if (!is.numeric(K)) K <- enquo(K)
-
-  # if only temperature is provided without the differences
-  if (is.null(Sym) | is.null(Asym)){
+  ck <- try(is.numeric(K),silent = T)
+  if (ck==T) {
     T_up <- enquo(T_up) # specify as a variable name
     T_low <- enquo(T_low)
     T_side <- enquo(T_side)
@@ -59,17 +73,21 @@ Cal_HFD <- function(data,
                               -3600*Dst*(-K+Asym)*Zax/((Sym-Asym)*Ztg*L) # negative flux
                               )
              )
-  } else { # if the differences are provided
-    # specify as variables
-    Sym <- enquo(Sym)
-    Asym <- enquo(Asym)
-    # load data and calculate
+    print("Constant K")
+  } else {
+    K <- enquo(K)
+    T_up <- enquo(T_up) # specify as a variable name
+    T_low <- enquo(T_low)
+    T_side <- enquo(T_side)
     df <- data %>%
-      mutate(SFD_hfd = ifelse(!!Sym>0,
-                              3600*Dst*(K+(!!Sym-!!Asym))*Zax/(!!Asym*Ztg*L), # positive flux, g cm-2 h-1
-                              -3600*Dst*(-K+!!Asym)*Zax/((!!Sym-!!Asym)*Ztg*L) # negative flux
-                              )
+      mutate(Sym=!!T_up-!!T_low,
+             Asym=!!T_side-!!T_low,
+             SFD_hfd = ifelse(Sym>0,
+                              3600*Dst*(!!K+(Sym-Asym))*Zax/(Asym*Ztg*L), # positive flux, g cm-2 h-1
+                              -3600*Dst*(-!!K+Asym)*Zax/((Sym-Asym)*Ztg*L) # negative flux
              )
+      )
+    print("dynamic K")
   }
   return(df)
 }

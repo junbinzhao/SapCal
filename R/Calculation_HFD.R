@@ -3,17 +3,16 @@
 #' that are directly measured by sensors (upper, lower and side) or temperature differences between the
 #' sensors (dTsym and dTasym) must be provided.
 #'
-#' @param L a numeric value, sapwood depth, cm
-#' @param Dst a numeric value, wood thermal diffusivity, cm2 s-1; default: 0.0025
+#' @param L a numeric value; sapwood depth, cm
+#' @param Dst a numeric value; wood thermal diffusivity, cm2 s-1; default: 0.0025
 #' @param data a data frame that includes the measured sap flow data
 #' @param T_up column name for the temperature measured by the upper sensor
 #' @param T_low column name for the temperature measured by the lower sensor
 #' @param T_side column name for the temperature measured by the side sensor
-#' @param Sym column name for the temperature difference between the upper and lower sensors
-#' @param Asym column name for the temperature difference between the lower and side sensors
-#' @param K a numeric value or a column name, K value indicates the dTasym value when zero sap flow occurs, see Nadezhdina et al. 2012
-#' @param Zax a numeric value, axial distance of the sensors, cm
-#' @param Ztg a numeric value, tangential distance of the sensors, cm
+#' @param K a numeric value (constant K) or a column name (dynamic K). K value indicates
+#' the dTasym value when zero sap flow occurs, see Nadezhdina et al. 2012
+#' @param Zax a numeric value; axial distance of the sensors, cm
+#' @param Ztg a numeric value; tangential distance of the sensors, cm
 #'
 #' @return a data frame with an additional column of the calculated sap flow density
 #' (SFD_hfd, g cm-2 h-1).
@@ -59,30 +58,33 @@ Cal_HFD <- function(data,
   #   stop("Temperature columns need to be assigned!")
   # }
 
+  # define the pipe from the package "magrittr"
+  `%>%` <- magrittr::`%>%`
+
   # check whether K is a number or a column
   ck <- try(is.numeric(K),silent = T)
   if (ck==T) {
-    T_up <- enquo(T_up) # specify as a variable name
-    T_low <- enquo(T_low)
-    T_side <- enquo(T_side)
+    T_up <- dplyr::enquo(T_up) # specify as a variable name
+    T_low <- dplyr::enquo(T_low)
+    T_side <- dplyr::enquo(T_side)
     df <- data %>%
-      mutate(Sym=!!T_up-!!T_low,
-             Asym=!!T_side-!!T_low,
-             SFD_hfd = ifelse(Sym>0,
+      dplyr::mutate(Sym=!!T_up-!!T_low,
+                    Asym=!!T_side-!!T_low,
+                    SFD_hfd = ifelse(Sym>0,
                               3600*Dst*(K+(Sym-Asym))*Zax/(Asym*Ztg*L), # positive flux, g cm-2 h-1
                               -3600*Dst*(-K+Asym)*Zax/((Sym-Asym)*Ztg*L) # negative flux
                               )
              )
     print("Constant K")
   } else {
-    K <- enquo(K)
-    T_up <- enquo(T_up) # specify as a variable name
-    T_low <- enquo(T_low)
-    T_side <- enquo(T_side)
+    K <- dplyr::enquo(K)
+    T_up <- dplyr::enquo(T_up) # specify as a variable name
+    T_low <- dplyr::enquo(T_low)
+    T_side <- dplyr::enquo(T_side)
     df <- data %>%
-      mutate(Sym=!!T_up-!!T_low,
-             Asym=!!T_side-!!T_low,
-             SFD_hfd = ifelse(Sym>0,
+      dplyr::mutate(Sym=!!T_up-!!T_low,
+                    Asym=!!T_side-!!T_low,
+                    SFD_hfd = ifelse(Sym>0,
                               3600*Dst*(!!K+(Sym-Asym))*Zax/(Asym*Ztg*L), # positive flux, g cm-2 h-1
                               -3600*Dst*(-!!K+Asym)*Zax/((Sym-Asym)*Ztg*L) # negative flux
              )

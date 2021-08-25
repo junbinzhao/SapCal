@@ -35,11 +35,11 @@
 #'
 #' # calculate sap flow density using dynamic K values that are provided as a variable
 #' df_lhb1 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K="K",Heat=2.6)
-#' head(df_lhb1$SFD_lhb)
+#' tapply(df_lhb1$SFD_lhb, df_lhb1$Depth, summary)
 #'
 #' # calculate sap flow density using constant K value
-#' df_lhb2 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K=.6,Heat=2.6)
-#' head(df_lhb2$SFD_lhb)
+#' df_lhb2 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K=.8,Heat=2.6)
+#' tapply(df_lhb2$SFD_lhb, df_lhb2$Depth, summary)
 #' @export
 Cal_LHB <- function(data,
                     T_up,
@@ -60,10 +60,10 @@ Cal_LHB <- function(data,
   SFD_lhb <- vector(length = nrow(data)) # create a vector for calculated flux
   for (i in 1:nrow(data)) {
     # variable from data
-    dT0 <- ifelse(is.numeric(K),-K,-data[i,K]) # oC; K in HFD
-    T_u <- data[i,T_up] # oC; upper sensor temperature
-    T_s <- data[i,T_side] # oC; side sensor temperature
-    T_l <- data[i,T_low] # oC; lower sensor temperature
+    dT0 <- ifelse(is.numeric(K),-K,as.numeric(-data[i,K])) # oC; K in HFD
+    T_u <- as.numeric(data[i,T_up]) # oC; upper sensor temperature
+    T_s <- as.numeric(data[i,T_side]) # oC; side sensor temperature
+    T_l <- as.numeric(data[i,T_low]) # oC; lower sensor temperature
     Sym <- T_u-T_l
     # lam_T
     lam_T <- H/(2*pi*dT0*sqrt(k))*log(sqrt(k)*dx/dy)

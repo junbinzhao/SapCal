@@ -4,17 +4,7 @@
 \alias{Cal_LHB}
 \title{Calculate sap flow density using the LHB approach}
 \usage{
-Cal_LHB(
-  data,
-  T_up = NULL,
-  T_low = NULL,
-  T_side = NULL,
-  K,
-  ratio = 2,
-  Heat,
-  Zax = 1.5,
-  Ztg = 0.5
-)
+Cal_LHB(data, T_up, T_low, T_side, K, ratio = 2, Heat, Zax = 1.5, Ztg = 0.5)
 }
 \arguments{
 \item{data}{a data frame that includes the measured sap flow data}
@@ -42,8 +32,8 @@ a data frame with an additional column of the calculated sap flow density
 (SFD_lhb, g cm-2 h-1).
 }
 \description{
-A function to calculate sap flow density using the LHB approach. The temperatures
-that are directly measured by sensors (upper, lower and side) must be provided.
+A function to calculate sap flow density using the LHB approach (Trcala and Cermak 2016).
+The temperatures that are directly measured by sensors (upper, lower and side) must be provided.
 }
 \examples{
 # load example data
@@ -63,9 +53,9 @@ df <- df \%>\%
 
 # calculate sap flow density using dynamic K values that are provided as a variable
 df_lhb1 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K="K",Heat=2.6)
-head(df_lhb1$SFD_lhb)
+tapply(df_lhb1$SFD_lhb, df_lhb1$Depth, summary)
 
 # calculate sap flow density using constant K value
-df_lhb2 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K=.6,Heat=2.6)
-head(df_lhb2$SFD_lhb)
+df_lhb2 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K=.8,Heat=2.6)
+tapply(df_lhb2$SFD_lhb, df_lhb2$Depth, summary)
 }

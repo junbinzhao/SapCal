@@ -34,12 +34,12 @@
 #'
 #' # calculate sap flow density using dynamic K values that are provided as a variable
 #' df_hfd1 <- Cal_HFD(df,T_up = U,T_low = L,T_side = S,K=K,L=7.5)
-#' head(df_hfd1$SFD_hfd)
+#' tapply(df_hfd1$SFD_hfd, df_hfd1$Depth, summary)
 #'
 #' # calculate sap flow density using constant K value
 #' df <- df %>% select(-K)
 #' df_hfd2 <- Cal_HFD(df,T_up = U,T_low = L,T_side = S,K=.6,L=7.5)
-#' head(df_hfd2$SFD_hfd)
+#' tapply(df_hfd2$SFD_hfd, df_hfd2$Depth, summary)
 #'
 #' @export
 Cal_HFD <- function(data,

@@ -4,17 +4,7 @@
 \alias{Cal_HFD}
 \title{Calculate sap flow density using the HFD approach}
 \usage{
-Cal_HFD(
-  data,
-  T_up = NULL,
-  T_low = NULL,
-  T_side = NULL,
-  K,
-  L,
-  Dst = 0.0025,
-  Zax = 1.5,
-  Ztg = 0.5
-)
+Cal_HFD(data, T_up, T_low, T_side, K, L, Dst = 0.0025, Zax = 1.5, Ztg = 0.5)
 }
 \arguments{
 \item{data}{a data frame that includes the measured sap flow data}
@@ -41,8 +31,8 @@ a data frame with an additional column of the calculated sap flow density
 (SFD_hfd, g cm-2 h-1).
 }
 \description{
-A function to calculate sap flow density using the HFD approach. The temperatures
-that are directly measured by sensors (upper, lower and side) must be provided.
+A function to calculate sap flow density using the HFD approach (Nadezhdina et al. 2012).
+The temperatures that are directly measured by sensors (upper, lower and side) must be provided.
 }
 \examples{
 # load example data
@@ -62,11 +52,11 @@ df <- df \%>\%
 
 # calculate sap flow density using dynamic K values that are provided as a variable
 df_hfd1 <- Cal_HFD(df,T_up = U,T_low = L,T_side = S,K=K,L=7.5)
-head(df_hfd1$SFD_hfd)
+tapply(df_hfd1$SFD_hfd, df_hfd1$Depth, summary)
 
 # calculate sap flow density using constant K value
 df <- df \%>\% select(-K)
 df_hfd2 <- Cal_HFD(df,T_up = U,T_low = L,T_side = S,K=.6,L=7.5)
-head(df_hfd2$SFD_hfd)
+tapply(df_hfd2$SFD_hfd, df_hfd2$Depth, summary)
 
 }

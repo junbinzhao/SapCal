@@ -18,7 +18,7 @@
 #'
 #' @examples
 #' # load example data
-#' df <- read.csv(file = system.file("extdata", "Soil_resp_example.csv", package = "FluxGapsR"),
+#' df <- read.csv(file = system.file("extdata", "HFD2J704_202006.csv", package = "SapCal"),
 #' header=T)
 #'
 #' # convert the data into long format

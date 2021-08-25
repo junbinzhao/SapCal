@@ -19,7 +19,7 @@
 #'
 #' @examples
 #' # load example data
-#' df <- read.csv(file = system.file("extdata", "Soil_resp_example.csv", package = "FluxGapsR"),
+#' df <- read.csv(file = system.file("extdata", "HFD2J704_202006.csv", package = "SapCal"),
 #' header=T)
 #'
 #' # convert the data into long format
@@ -35,11 +35,11 @@
 #'
 #' # calculate sap flow density using dynamic K values that are provided as a variable
 #' df_lhb1 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K="K",Heat=2.6)
-#' tapply(df_lhb1$SFD_lhb, df_lhb1$Depth, summary)
+#' tapply(df_lhb1$SFD_lhb,df_lhb1$Depth,summary)
 #'
 #' # calculate sap flow density using constant K value
 #' df_lhb2 <- Cal_LHB(df,T_up = "U",T_low = "L",T_side = "S",K=.8,Heat=2.6)
-#' tapply(df_lhb2$SFD_lhb, df_lhb2$Depth, summary)
+#' tapply(df_lhb2$SFD_lhb,df_lhb2$Depth,summary)
 #' @export
 Cal_LHB <- function(data,
                     T_up,

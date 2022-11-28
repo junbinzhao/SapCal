@@ -10,7 +10,8 @@ The goal of SapCal is to calculate tree sap flow using HFD (Nadezhdina
 et al. 2012) and LHB methods (Trcala and Cermak 2016). This package is
 created in association with the study “Inconsistent results of sap flow
 calculations from Heat Field Deformation (HFD) and Linear Heat Balance
-(LHB) methods” (Zhao et al., to be published).
+(LHB) methods” ([Zhao et al., 2022, Agricultural and Forest
+Meteorology](https://www.sciencedirect.com/science/article/pii/S0168192322001642)).
 
 ## Installation
 
